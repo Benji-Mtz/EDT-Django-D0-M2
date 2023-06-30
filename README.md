@@ -179,3 +179,36 @@ Podemos abrir el shell de django con `python manage.py shell`
 (./.env) python manage.py migrate
 (./.env) python manage.py createsuperuser #admin:admin
 ```
+
+Para crear la relación de la tabla usuarios con el articulo podemos hacer lo siguiente `./blog/models.py`
+
+```python
+from django.contrib.auth.models import User
+
+
+class Articulo(models.Model):
+    titulo = models.CharField(max_length=200)
+    imagen = models.CharField(max_length=255)
+    # autor viene de la clase User, RESTRICT - No permite eliminar el usuario si tiene articulos
+    autor = models.ForeignKey(User, on_delete=models.RESTRICT)
+    
+    def __str__(self) -> str:
+        return self.titulo
+```
+y rehacemos los comandos
+
+```sh
+(./.env) python manage.py makemigrations 
+(./.env) python manage.py migrate
+```
+Si marcara error en el autor por ser ahora foreingkey en lugar de un char solo se borran los registros
+
+## Visualizar nuestros modelos en el admin
+
+Despues de loguearnos en `http://127.0.0.1:8000/admin/` con las respectivas credenciales sera necesario agregar nuestros modelos al archivo `admin.py` de nuestra app para que se visualice correctamente.
+
+```python
+from .models import Articulo
+
+admin.site.register(Articulo)
+```
